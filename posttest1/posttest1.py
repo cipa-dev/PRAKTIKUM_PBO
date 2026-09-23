@@ -2,12 +2,12 @@ import os
 class Produk:
     nama_toko = "SYIFA HIJAB"
     total_produk_terdaftar = 0
-    diskon_member = 0.1  # diskon 10% untuk member
+    satuan = "pcs"
     def __init__(self, nama_produk, harga, stok):
         self.nama_produk = nama_produk      # atribut public
         self.harga = harga                  # atribut public
         self.__stok = stok                  # atribut private
-        Produk.total_produk_terdaftar += 1  # increment total produk
+        Produk.total_produk_terdaftar += 1
 
     @property
     def stok(self):
@@ -22,7 +22,7 @@ class Produk:
             return
         self.__stok = nilai_baru
     def tampilkan_info(self):
-        print(f"[{self.nama_toko}] {self.nama_produk} | harga: Rp{self.harga:,} | stok: {self.__stok}")
+        print(f"[{self.nama_toko}] {self.nama_produk} | harga: Rp{self.harga:,} | stok: {self.__stok} {self.satuan}")
     def kurangi_stok(self, jumlah):
         if jumlah <= self.__stok:
             self.__stok -= jumlah
@@ -34,23 +34,14 @@ class Produk:
     @classmethod
     def dari_dict(cls, data):
         return cls(data["nama"], data["harga"], data["stok"])
-    @classmethod
-    def ubah_diskon_member(cls, diskon_baru):
-        cls.diskon_member = diskon_baru
-        print(f"diskon member adalah {cls.diskon_member*100:.0f}%")
-    @staticmethod
-    def validasi_kode_produk(kode):
-        return kode.startswith("HJB-") and len(kode) > 4
 
 class Kasir:
     nama_toko = "SYIFA HIJAB"
     total_transaksi = 0
-    pajak = 0.0 
-    def __init__(self, nama_kasir, shift, role="kasir"):
+    pajak = 0.0
+    def __init__(self, nama_kasir, shift):
         self.nama_kasir = nama_kasir   # public
         self.shift = shift             # public
-        # role cuma boleh "admin" atau "kasir", kalau salah default ke "kasir"
-        self.role = role if role in ("admin", "kasir") else "kasir"
         self.__saldo_kas = 0           # private
 
     @property
@@ -77,60 +68,42 @@ class Kasir:
             print("transaksi gagal, stok tidak cukup")
             return False
     def atur_stok(self, produk: Produk, stok_baru):
-        if self.role != "admin":
-            print(f"akses ditolak, {self.nama_kasir} bukan admin, gabisa ubah stok")
-            return
         produk.stok = stok_baru
-        print(f"admin {self.nama_kasir} ubah stok '{produk.nama_produk}' jadi {produk.stok}")
-    def atur_diskon(self, diskon_baru):
-        if self.role != "admin":
-            print(f"akses ditolak, {self.nama_kasir} bukan admin, gabisa ubah diskon")
-            return
-        Produk.ubah_diskon_member(diskon_baru)
+        print(f"{self.nama_kasir} ubah stok '{produk.nama_produk}' jadi {produk.stok}")
 
     @classmethod
     def buat_dari_data(cls, data):
-        return cls(data["nama"], data["shift"], data.get("role", "kasir"))
-    @classmethod
-    def reset_total_transaksi(cls):
-        cls.total_transaksi = 0
-        print("total transaksi sudah direset ke 0.")
+        return cls(data["nama"], data["shift"])
+
     @staticmethod
     def hitung_total_harga(harga, jumlah):
         return harga * jumlah
 
 class Pelanggan:
-    jenis_member = ["reguler", "silver", "gold"]
     total_pelanggan = 0
     poin_per_pembelian = 5
-    def __init__(self, nama, no_hp, member="reguler"):
+    nama_program = "Member SYIFA HIJAB"
+    def __init__(self, nama, no_hp):
         self.nama = nama            # public
-        self.member = member        # public
-        self.__no_hp = None         # private
-        self.no_hp = no_hp          # lewat setter agar validasi
-        self.poin = 0
+        self.poin = 0                # public
+        self.__no_hp = None          # private
+        self.no_hp = no_hp           # lewat setter, kalau invalid raise error
         Pelanggan.total_pelanggan += 1
-        
+
     @property
     def no_hp(self):
         return self.__no_hp[:4] + "xxxx" + self.__no_hp[-2:]
     @no_hp.setter
     def no_hp(self, nomor):
-        if Pelanggan.validasi_no_hp(nomor):
-            self.__no_hp = nomor
-        else:
-            print(f"nomor HP '{nomor}' tidak valid, harus diawali 08 dan berisi angka.")
-            self.__no_hp = "081200000000"
+        if not Pelanggan.validasi_no_hp(nomor):
+            raise ValueError(f"nomor HP '{nomor}' tidak valid, harus diawali 08 dan berisi angka minimal 10 digit")
+        self.__no_hp = nomor
     def tambah_poin(self):
         self.poin += Pelanggan.poin_per_pembelian
         print(f"{self.nama} dapat tambahan {Pelanggan.poin_per_pembelian} poin, total poin: {self.poin}")
     def tampilkan_data(self):
-        print(f"Nama: {self.nama} | Member: {self.member} | HP: {self.no_hp} | Poin: {self.poin}")
+        print(f"[{self.nama_program}] Nama: {self.nama} | HP: {self.no_hp} | Poin: {self.poin}")
 
-    @classmethod
-    def dari_string(cls, teks):
-        nama, no_hp, member = teks.split(",")
-        return cls(nama.strip(), no_hp.strip(), member.strip())
     @staticmethod
     def validasi_no_hp(no_hp):
         return no_hp.isdigit() and no_hp.startswith("08") and len(no_hp) >= 10
@@ -150,6 +123,12 @@ def input_angka(teks, boleh_desimal=False):
             return float(nilai) if boleh_desimal else int(nilai)
         except ValueError:
             print("input harus angka, coba lagi")
+def input_no_hp(teks="no hp (diawali 08, minimal 10 digit angka): "):
+    while True:
+        nomor = input(teks)
+        if Pelanggan.validasi_no_hp(nomor):
+            return nomor
+        print("nomor gak valid, coba lagi")
 def cari_pelanggan(nama):
     for p in daftar_pelanggan:
         if p.nama.lower() == nama.lower():
@@ -158,11 +137,10 @@ def cari_pelanggan(nama):
 def login():
     global kasir_aktif
     clear_screen()
-    print("=== LOGIN KASIR SYIFA HIJAB ===")
+    print("--- LOGIN KASIR SYIFA HIJAB ---")
     nama = input("nama kamu: ")
-    role = input("login sebagai admin atau kasir? (admin/kasir): ").strip().lower()
-    kasir_aktif = Kasir(nama, "harian", role)
-    print(f"\nhalo {kasir_aktif.nama_kasir}, kamu login sebagai {kasir_aktif.role}")
+    kasir_aktif = Kasir.buat_dari_data({"nama": nama, "shift": "harian"})
+    print(f"\nhalo {kasir_aktif.nama_kasir}, selamat kerja!")
     pause()
 def menu_lihat_produk():
     if not daftar_produk:
@@ -173,18 +151,13 @@ def menu_lihat_produk():
         print(f"{i}. ", end="")
         p.tampilkan_info()
 def menu_tambah_produk():
-    if kasir_aktif.role != "admin":
-        print("hanya admin yang bisa menambah produk")
-        return
     nama = input("nama produk: ")
     harga = input_angka("harga: ")
     stok = input_angka("stok awal: ")
-    daftar_produk.append(Produk(nama, harga, stok))
+    produk_baru = Produk.dari_dict({"nama": nama, "harga": harga, "stok": stok})
+    daftar_produk.append(produk_baru)
     print("produk berhasil ditambah")
 def menu_ubah_stok():
-    if kasir_aktif.role != "admin":
-        print("hanya admin yang bisa ubah stok")
-        return
     menu_lihat_produk()
     if not daftar_produk:
         return
@@ -193,41 +166,16 @@ def menu_ubah_stok():
         stok_baru = input_angka("stok baru: ")
         kasir_aktif.atur_stok(daftar_produk[idx - 1], stok_baru)
     else:
-        print("nomor produk tidak valid")
-def submenu_produk():
-    while True:
-        clear_screen()
-        print("=== KELOLA PRODUK ===")
-        if kasir_aktif.role == "admin":
-            print("1. lihat produk")
-            print("2. tambah produk")
-            print("3. ubah stok")
-            print("0. kembali")
-        else:
-            print("1. lihat produk")
-            print("0. kembali")
-        pilihan = input("pilih: ")
-        print()
-        if pilihan == "1":
-            menu_lihat_produk()
-        elif kasir_aktif.role == "admin" and pilihan == "2":
-            menu_tambah_produk()
-        elif kasir_aktif.role == "admin" and pilihan == "3":
-            menu_ubah_stok()
-        elif pilihan == "0":
-            return
-        else:
-            print("menu tidak valid, coba lagi")
-        pause()
+        print("nomor produk tidak ada")
 def menu_transaksi():
     clear_screen()
-    print("=== TRANSAKSI JUAL ===")
+    print("--- TRANSAKSI JUAL ---")
     menu_lihat_produk()
     if not daftar_produk:
         return
     idx = input_angka("pilih nomor produk: ")
     if not (1 <= idx <= len(daftar_produk)):
-        print("nomor produk tidak valid")
+        print("nomor produk tidak ada")
         return
     produk = daftar_produk[idx - 1]
     jumlah = input_angka("jumlah beli: ")
@@ -243,10 +191,10 @@ def menu_transaksi():
         else:
             print("nama tidak terdaftar sebagai member")
     else:
-        mau_daftar = input("mau daftar member? (y/n): ").strip().lower()
+        mau_daftar = input("mau daftar member sekalian? (y/n): ").strip().lower()
         if mau_daftar == "y":
             nama = input("nama: ")
-            no_hp = input("no hp: ")
+            no_hp = input_no_hp()
             pelanggan_baru = Pelanggan(nama, no_hp)
             daftar_pelanggan.append(pelanggan_baru)
             pelanggan_baru.tambah_poin()
@@ -259,61 +207,23 @@ def menu_lihat_pelanggan():
         p.tampilkan_data()
 def menu_tambah_pelanggan():
     nama = input("nama pelanggan: ")
-    no_hp = input("no hp: ")
-    member = input("jenis member (reguler/silver/gold): ")
-    daftar_pelanggan.append(Pelanggan(nama, no_hp, member))
+    no_hp = input_no_hp()
+    daftar_pelanggan.append(Pelanggan(nama, no_hp))
     print("pelanggan berhasil ditambah")
-def submenu_pelanggan():
-    while True:
-        clear_screen()
-        print("=== KELOLA PELANGGAN ===")
-        print("1. lihat pelanggan")
-        print("2. tambah pelanggan manual")
-        print("0. kembali")
-        pilihan = input("pilih: ")
-        print()
-        if pilihan == "1":
-            menu_lihat_pelanggan()
-        elif pilihan == "2":
-            menu_tambah_pelanggan()
-        elif pilihan == "0":
-            return
-        else:
-            print("menu tidak valid, coba lagi")
-        pause()
-def submenu_admin():
-    if kasir_aktif.role != "admin":
-        print("akses ditolak, hanya admin")
-        pause()
-        return
-    while True:
-        clear_screen()
-        print("=== KHUSUS ADMIN ===")
-        print("1. ubah diskon member")
-        print("2. lihat saldo kas  dan total transaksi")
-        print("0. kembali")
-        pilihan = input("pilih: ")
-        print()
-        if pilihan == "1":
-            diskon = input_angka("diskon baru: ", boleh_desimal=True)
-            kasir_aktif.atur_diskon(diskon)
-        elif pilihan == "2":
-            print(f"saldo kas {kasir_aktif.nama_kasir}: Rp{kasir_aktif.saldo_kas:,}")
-            print(f"total transaksi semua kasir: {Kasir.total_transaksi}")
-        elif pilihan == "0":
-            return
-        else:
-            print("menu tidak valid, coba lagi")
-        pause()
-        
+def menu_saldo():
+    print(f"saldo kas {kasir_aktif.nama_kasir}: Rp{kasir_aktif.saldo_kas:,}")
+    print(f"total transaksi semua kasir: {Kasir.total_transaksi}")
 def tampilkan_menu():
-    print(f"===== SYIFA HIJAB ({kasir_aktif.nama_kasir} - {kasir_aktif.role}) =====")
-    print("1. kelola produk")
-    print("2. transaksi jual")
-    print("3. kelola pelanggan")
-    if kasir_aktif.role == "admin":
-        print("4. khusus admin")
+    print(f"--- SYIFA HIJAB ({kasir_aktif.nama_kasir}) ---")
+    print("1. lihat produk")
+    print("2. tambah produk")
+    print("3. ubah stok")
+    print("4. transaksi jual")
+    print("5. lihat pelanggan")
+    print("6. tambah pelanggan")
+    print("7. lihat saldo kas & total transaksi")
     print("0. keluar")
+
 if __name__ == "__main__":
     login()
     while True:
@@ -322,17 +232,23 @@ if __name__ == "__main__":
         pilihan = input("pilih menu: ")
         print()
         if pilihan == "1":
-            submenu_produk()
+            menu_lihat_produk()
         elif pilihan == "2":
-            menu_transaksi()
-            pause()
+            menu_tambah_produk()
         elif pilihan == "3":
-            submenu_pelanggan()
-        elif pilihan == "4" and kasir_aktif.role == "admin":
-            submenu_admin()
+            menu_ubah_stok()
+        elif pilihan == "4":
+            menu_transaksi()
+        elif pilihan == "5":
+            menu_lihat_pelanggan()
+        elif pilihan == "6":
+            menu_tambah_pelanggan()
+        elif pilihan == "7":
+            menu_saldo()
         elif pilihan == "0":
-            print("terima kasih sudah pakai program SYIFA HIJAB")
+            print("terima kasih sudah belanja di SYIFA HIJAB")
             break
         else:
             print("menu tidak valid, coba lagi")
+        if pilihan != "0":
             pause()

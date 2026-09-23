@@ -1,135 +1,72 @@
-# Deskripsi Program
-Program SYIFA HIJAB adalah program kasir sederhana yang dibuat menggunakan Python. Program ini digunakan untuk mengelola produk, melakukan transaksi penjualan, dan mengelola data pelanggan. Program ini menggunakan konsep Object Oriented Programming, sehingga data dan fungsi dikelompokkan ke dalam beberapa class. Ada tiga class utama yang digunakan, yaitu `Produk`, `Kasir`, dan `Pelanggan`. Program juga memiliki dua jenis pengguna, yaitu admin dan kasir. Beberapa fitur seperti menambah produk, mengubah stok, dan mengubah diskon hanya bisa dilakukan oleh admin.
+# deskripsi program
+program ini digunakan untuk mengelola data produk, melakukan transaksi penjualan, serta mengelola data pelanggan pada toko hijab. program ini menerapkan konsep object oriented programming, sehingga data dan fungsi dikelompokkan ke dalam beberapa class. Terdapat tiga class utama yang digunakan, yaitu `Produk`, `Kasir`, dan `Pelanggan`. program dijalankan secara interaktif melalui terminal menggunakan `input()`, sehingga pengguna dapat langsung memasukkan data dan mencoba setiap fitur yang tersedia.
 
-# Struktur Class
-1. Class Produk
-Class `Produk` digunakan untuk menyimpan data produk yang dijual di toko.
-Beberapa atribut yang digunakan yaitu:
-* `nama_produk` untuk menyimpan nama produk.
-* `harga` untuk menyimpan harga produk.
-* `__stok` untuk menyimpan jumlah stok produk.
-* `nama_toko` untuk menyimpan nama toko.
-* `total_produk_terdaftar` untuk menghitung jumlah produk yang dibuat.
-* `diskon_member` untuk menyimpan diskon member.
-Class ini memiliki beberapa method, seperti `tampilkan_info()` untuk menampilkan data produk dan `kurangi_stok()` untuk mengurangi stok ketika terjadi transaksi.
-Atribut `__stok` dibuat private sehingga perubahan stok tidak bisa dilakukan secara langsung. Untuk mengatur stok digunakan property dan setter yang juga melakukan pengecekan agar stok tidak boleh negatif.
+# struktur class
+1. class Produk
+class `Produk` digunakan untuk menyimpan data produk yang dijual di toko.
+atribut yang digunakan antara lain:
+- `nama_produk` untuk menyimpan nama produk
+- `harga` untuk menyimpan harga produk
+- `__stok` untuk menyimpan jumlah stok produk
+- `nama_toko` untuk menyimpan nama toko
+- `total_produk_terdaftar` untuk menghitung jumlah produk yang telah dibuat
+- `satuan` untuk menyimpan satuan produk (pcs)
+method `tampilkan_info()` digunakan untuk menampilkan data produk, sedangkan `kurangi_stok()` digunakan untuk mengurangi stok saat terjadi transaksi. atribut `__stok` bersifat private sehingga tidak bisa diubah secara langsung. perubahan stok hanya dapat dilakukan melalui property `stok`, yang juga melakukan validasi agar stok tidak diisi angka negatif atau bukan bilangan bulat.
 
-2. Class Kasir
-Class `Kasir` digunakan untuk menyimpan data kasir dan menjalankan proses transaksi.
-Atribut yang digunakan antara lain:
-* `nama_kasir` untuk nama kasir.
-* `shift` untuk menyimpan shift kasir.
-* `role` untuk menentukan apakah pengguna merupakan admin atau kasir.
-* `__saldo_kas` untuk menyimpan saldo kas.
-* `total_transaksi` untuk menghitung jumlah transaksi.
-Method `proses_transaksi()` digunakan untuk melakukan transaksi penjualan. Method ini akan memeriksa stok produk, mengurangi stok jika mencukupi, menghitung total harga, dan menambahkan hasil transaksi ke saldo kas. Class `Kasir` juga memiliki method `atur_stok()` dan `atur_diskon()`. Kedua fitur tersebut hanya bisa digunakan jika role pengguna adalah admin.
+2. class Kasir
+class `Kasir` digunakan untuk menyimpan data kasir dan menjalankan proses transaksi
+atribut yang digunakan:
+- `nama_kasir` untuk menyimpan nama kasir
+- `shift` untuk menyimpan shift kerja kasir
+- `__saldo_kas` untuk menyimpan saldo hasil transaksi
+- `total_transaksi` untuk menghitung jumlah transaksi yang terjadi
+- `pajak` sebagai atribut konfigurasi umum
+method `proses_transaksi()` digunakan untuk melakukan transaksi penjualan. method ini memeriksa stok produk, mengurangi stok jika mencukupi, menghitung total harga, lalu menambahkan hasilnya ke saldo kas. class ini juga memiliki method `atur_stok()` untuk memperbarui stok produk.
 
-3. Class Pelanggan
-Class `Pelanggan` digunakan untuk menyimpan data pelanggan atau member. Data yang disimpan antara lain nama, jenis member, nomor HP, dan poin. Nomor HP disimpan dalam atribut private `__no_hp`. Saat ditampilkan, nomor HP akan dibuat sebagian menjadi `xxxx` agar tidak ditampilkan secara penuh. Method `tambah_poin()` digunakan untuk menambahkan poin setelah pelanggan melakukan pembelian. Program memberikan 5 poin untuk setiap pembelian.
+3. class pelanggan
+class `Pelanggan` digunakan untuk menyimpan data member toko. Data yang disimpan meliputi nama, nomor HP, dan poin. nomor HP disimpan pada atribut private `__no_hp` dan hanya bisa diubah melalui property yang memvalidasi format nomor (harus diawali angka 08 dan minimal 10 digit). jika format tidak sesuai, perubahan akan ditolak melalui `raise ValueError`. saat ditampilkan, sebagian nomor HP disamarkan menjadi `xxxx` agar tidak terlihat secara penuh. Method `tambah_poin()` digunakan untuk menambahkan poin setiap kali pelanggan melakukan pembelian, dengan nilai poin diatur pada atribut kelas `poin_per_pembelian`.
 
-# Konsep OOP yang Digunakan
-Program ini menerapkan beberapa konsep OOP, yaitu:
-1. Encapsulation
-Encapsulation digunakan pada atribut yang bersifat private, seperti:
-__stok
-__saldo_kas
-__no_hp
-Atribut tersebut tidak diakses secara langsung, tetapi melalui property atau method tertentu.
-
-2. Class Attribute
-Class attribute digunakan untuk data yang digunakan bersama oleh objek dalam satu class.
-Contohnya:
-Produk.total_produk_terdaftar
-Kasir.total_transaksi
-Pelanggan.total_pelanggan
-
-3. Class Method
-Class method digunakan pada beberapa fungsi seperti `dari_dict()`, `buat_dari_data()`, dan `ubah_diskon_member()`.
-
-4. Static Method
-Static method digunakan untuk fungsi yang tidak bergantung pada objek tertentu, contohnya:
-validasi_no_hp()
-hitung_total_harga()
-validasi_kode_produk()
-
-5. Property dan Setter
-Property digunakan untuk mengatur cara mengambil dan mengubah atribut private. Contohnya digunakan pada stok produk, saldo kas, dan nomor HP.
+# konsep OOP yang digunakan
+1. encapsulation: diterapkan pada atribut private `__stok`, `__saldo_kas`, dan `__no_hp`, yang hanya bisa diakses atau diubah melalui property dan method tertentu.
+2. class attribute: digunakan untuk data yang dipakai bersama oleh seluruh objek, contohnya `Produk.total_produk_terdaftar`, `Kasir.total_transaksi`, dan `Pelanggan.total_pelanggan`.
+3. class method: digunakan pada `dari_dict()` (Produk) dan `buat_dari_data()` (Kasir) sebagai factory method untuk membuat objek dari data dictionary.
+4. static method: digunakan pada `hitung_total_harga()` (Kasir) dan `validasi_no_hp()` (Pelanggan), yaitu fungsi bantuan yang tidak bergantung pada objek tertentu.
+5. property dan setter: digunakan untuk mengatur cara mengambil dan mengubah atribut private, contohnya pada `stok`, `saldo_kas`, dan `no_hp`.
 
 # Alur Program
-Saat program dijalankan, pengguna terlebih dahulu melakukan login.
-Pengguna memasukkan nama dan memilih role sebagai `admin` atau `kasir`.
-Setelah login, akan muncul menu utama:
-
-===== SYIFA HIJAB =====
-1. kelola produk
-2. transaksi jual
-3. kelola pelanggan
-4. panel admin
+Saat program dijalankan, pengguna terlebih dahulu login dengan memasukkan nama. Setelah itu, akan muncul menu utama:
+----- SYIFA HIJAB -----
+1. lihat produk
+2. tambah produk
+3. ubah stok
+4. transaksi jual
+5. lihat pelanggan
+6. tambah pelanggan
+7. lihat saldo kas & total transaksi
 0. keluar
-Dari menu tersebut pengguna dapat memilih fitur yang tersedia sesuai dengan role masing-masing.
 
 # Fitur Program
-1. Kelola Produk
-Menu ini digunakan untuk melihat produk, menambah produk baru, dan mengubah stok. Fitur tambah produk dan ubah stok hanya dapat digunakan oleh admin.
-2. Transaksi Jual
-Pada menu transaksi, pengguna memilih produk dan memasukkan jumlah pembelian. Jika stok mencukupi, program akan mengurangi stok dan menghitung total harga. Saldo kas dan jumlah transaksi juga akan bertambah. Setelah transaksi selesai, program akan menanyakan apakah pembeli sudah menjadi member. Jika sudah, pelanggan akan mendapatkan poin.
-3. Kelola Pelanggan
-Menu ini digunakan untuk melihat dan menambahkan data pelanggan. Data pelanggan terdiri dari nama, nomor HP, jenis member, dan poin.
-4. Panel Admin
-Panel admin digunakan untuk mengubah diskon member dan melihat saldo kas serta jumlah transaksi. Menu ini hanya bisa dibuka oleh pengguna dengan role `admin`.
+1. Lihat & Tambah Produk: menampilkan daftar produk yang tersedia, atau menambahkan produk baru dengan memasukkan nama, harga, dan stok awal.
+2. Ubah Stok: memperbarui jumlah stok produk yang sudah ada.
+3. Transaksi Jual: memilih produk dan jumlah pembelian. Jika stok mencukupi, stok akan berkurang dan saldo kas bertambah. Setelah transaksi, program akan menanyakan apakah pembeli sudah menjadi member untuk menambahkan poin.
+4. Lihat & Tambah Pelanggan: menampilkan daftar pelanggan atau mendaftarkan pelanggan baru dengan nama dan nomor HP.
+5. Lihat Saldo Kas & Total Transaksi: menampilkan saldo kas kasir yang sedang login beserta jumlah transaksi keseluruhan.
 
-# Cara Menjalankan Program
-Sesuaikan `nama_file.py` dengan nama file program yang digunakan, lalu run saja.
+# cara menjalankan program
+tinggal run aja di terminal
 
 # Panduan Pengujian
-1. Pengujian Login Admin
-Jalankan program kemudian masukkan nama dan pilih:
-login sebagai admin atau kasir? (admin/kasir): admin
-Jika berhasil, program akan menampilkan bahwa pengguna login sebagai admin.
-Setelah itu coba masuk ke menu kelola produk dan panel admin.
-2. Pengujian Login Kasir
-Login menggunakan role:
-kasir
-Kemudian coba masuk ke menu kelola produk dan pilih tambah produk.
-Hasil yang diharapkan:
-hanya admin yang bisa menambah produk
-Hal yang sama juga berlaku ketika kasir mencoba mengubah stok atau membuka panel admin.
-3. Pengujian Tambah Produk
-Login sebagai admin kemudian pilih:
-1. kelola produk
-2. tambah produk
-Masukkan nama produk, harga, dan stok.
-Jika berhasil, program akan menampilkan:
-produk berhasil ditambah
-4. Pengujian Transaksi
-Pastikan sudah ada produk terlebih dahulu.
-Pilih:
-2. transaksi jual
-Kemudian pilih produk dan masukkan jumlah pembelian.
-Jika stok mencukupi, transaksi akan berhasil dan stok produk akan berkurang.
-5. Pengujian Stok Tidak Cukup
-Coba melakukan transaksi dengan jumlah pembelian yang lebih besar dari stok.
-Program akan menampilkan pesan bahwa stok tidak cukup dan transaksi tidak akan dilanjutkan.
-6. Pengujian Data Pelanggan
-Masuk ke:
-3. kelola pelanggan
-2. tambah pelanggan manual
-Masukkan nama, nomor HP, dan jenis member.
-Setelah berhasil ditambahkan, data pelanggan dapat dilihat melalui menu lihat pelanggan.
-7. Pengujian Poin Member
-Lakukan transaksi kemudian pilih `y` ketika program menanyakan apakah pembeli sudah menjadi member.
-Masukkan nama member yang sudah terdaftar.
-Jika ditemukan, poin pelanggan akan bertambah.
-8. Pengujian Input Tidak Valid
-Coba masukkan huruf ketika program meminta input angka, misalnya pada harga atau jumlah stok.
-Program akan menampilkan:
-input harus angka, coba lagi
-Program kemudian meminta pengguna memasukkan angka kembali.
-9. Pengujian Hak Akses Admin
-Login sebagai kasir kemudian coba membuka panel admin.
-Hasil yang diharapkan:
-akses ditolak, hanya admin
-Hal ini menunjukkan bahwa pembatasan hak akses berdasarkan role sudah berjalan.
-
-# Kesimpulan
-Program SYIFA HIJAB merupakan program kasir sederhana yang menerapkan konsep OOP dalam Python. Program ini memiliki tiga class utama yaitu `Produk`, `Kasir, dan `Pelanggan`. Dengan program ini, pengguna dapat mengelola produk, melakukan transaksi, mengelola pelanggan, serta mengatur fitur tertentu berdasarkan hak akses admin dan kasir. Konsep OOP seperti encapsulation, class attribute, class method, static method, property, dan setter juga diterapkan dalam program untuk mengatur data dan fungsi agar lebih terstruktur.
+1. Pengujian Tambah Produk
+Pilih menu `2. tambah produk`, lalu masukkan nama, harga, dan stok. Jika berhasil, program akan menampilkan pesan `produk berhasil ditambah`.
+2. Pengujian Transaksi
+Pastikan produk sudah tersedia, lalu pilih menu `4. transaksi jual`. Pilih produk dan masukkan jumlah pembelian sesuai stok yang ada. Jika berhasil, stok produk akan berkurang dan saldo kas bertambah.
+3. Pengujian Stok Tidak Cukup
+Lakukan transaksi dengan jumlah pembelian melebihi stok yang tersedia. Program akan menampilkan pesan bahwa stok tidak cukup dan transaksi tidak dilanjutkan.
+4. Pengujian Setter Stok (Valid dan Tidak Valid)
+Pilih menu `3. ubah stok`, lalu coba masukkan angka positif (valid) dan angka negatif (tidak valid). Untuk input tidak valid, program akan menampilkan pesan penolakan dan stok tidak berubah.
+5. Pengujian Poin Member
+Setelah melakukan transaksi, pilih `y` saat ditanya apakah pembeli sudah menjadi member, lalu masukkan nama member yang terdaftar. Jika ditemukan, poin pelanggan akan bertambah.
+6. Pengujian Setter Nomor HP (Valid dan Tidak Valid)
+Pilih menu `6. tambah pelanggan`, lalu coba masukkan nomor HP dengan format salah (misalnya tidak diawali 08). Program akan menolak dan meminta input ulang hingga nomor yang dimasukkan valid.
+7. Pengujian Input Tidak Valid
+Coba masukkan huruf saat program meminta input angka, misalnya pada harga atau stok. Program akan menampilkan pesan `input harus angka, coba lagi` dan meminta input kembali.
